@@ -7,6 +7,7 @@
 # CLI Sources ##################################################################
 
 PWRUSBCTL_SRCS = src/main.cpp
+PWRUSBCTL_SRCS += src/power_usb_device.cc
 
 # Binary Targets ###############################################################
 
@@ -21,6 +22,7 @@ CFLAGS += -Wall
 # CLI Compiler Flags ###########################################################
 
 PWRUSBCTL_CFLAGS = $(CFLAGS)
+PWRUSBCTL_CFLAGS += `pkg-config --cflags hidapi-libusb`
 
 # Common Linker Flags ##########################################################
 
@@ -29,6 +31,7 @@ LDFLAGS =
 # CLI Linker Flags #############################################################
 
 PWRUSBCTL_LDFLAGS  = $(LDFLAGS)
+PWRUSBCTL_LDFLAGS += `pkg-config --libs hidapi-libusb`
 
 # Build Targets ################################################################
 
