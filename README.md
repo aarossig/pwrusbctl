@@ -11,16 +11,65 @@ them for support.
 
 Run the binary with ``--help`` to obtain usage information.
 
-    Brief USAGE:
+    USAGE: 
+    
        ./pwrusbctl  [--outlet_disable <index>] [--outlet_enable <index>]
                     [--outlet_default_disable <index>] [--outlet_default_enable
                     <index>] [--interval <microseconds>] [-c <count>] [-l]
                     [--line_voltage <volts>] [--energy] [--current]
                     [--reset_charge_accumulator] [--device_info] [--]
                     [--version] [-h]
-
-    For complete USAGE and HELP type:
-       ./pwrusbctl --help
+    
+    
+    Where: 
+    
+       --outlet_disable <index>
+         The index of the outlet to disable
+    
+       --outlet_enable <index>
+         The index of the outlet to enable
+    
+       --outlet_default_disable <index>
+         The index of the outlet to set disabled by default
+    
+       --outlet_default_enable <index>
+         The index of the outlet to set enabled by default
+    
+       --interval <microseconds>
+         The interval between logs, ignored for just one log
+    
+       -c <count>,  --log_count <count>
+         Requests stats to be logged n times, ignored if log_indefinitely
+    
+       -l,  --log_indefinitely
+         Requests stats to be logged indefinitely
+    
+       --line_voltage <volts>
+         Specify the line voltage used in energy estimation
+    
+       --energy
+         Print energy (in kWh) used by attached devices since the last reset
+    
+       --current
+         Print the current used by attached devices
+    
+       --reset_charge_accumulator
+         Resets the charge accumulator
+    
+       --device_info
+         Print device information
+    
+       --,  --ignore_rest
+         Ignores the rest of the labeled arguments following this flag.
+    
+       --version
+         Displays version information and exits.
+    
+       -h,  --help
+         Displays usage information and exits.
+    
+    
+       a tool for interacting with PowerUSB USB-controlled power strip
 
 ## Build Instructions
 
