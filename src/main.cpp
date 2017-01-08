@@ -44,6 +44,9 @@ struct LoggingConfig {
   //! Whether or not current should be logged.
   bool log_current;
 
+  //! Whether or not power should be logged.
+  bool log_power;
+
   //! Whether or not the total energy should be logged.
   bool log_energy;
 
@@ -67,7 +70,7 @@ struct LoggingConfig {
    * configuration.
    */
   bool LogsEnabled() const {
-    return log_current || log_energy;
+    return log_current|| log_power || log_energy;
   }
 };
 
@@ -144,10 +147,17 @@ void SetDefaultSocketState(const PowerUsbDevice& device, size_t outlet_index,
  */
 void LogStats(const PowerUsbDevice& device, const LoggingConfig& config) {
   for (size_t i = 0; config.log_indefinitely || i < config.log_count; i++) {
-    if (config.log_current) {
+    if (config.log_current || config.log_power) {
       int16_t current;
       if (device.GetInstantaneousCurrent(&current)) {
-        fprintf(stdout, "Current: %" PRId16 "mA\n", current);
+        if (config.log_current) {
+          fprintf(stdout, "Current: %" PRId16 "mA\n", current);
+        }
+
+        if (config.log_power) {
+          float power = (current / 1000.0f) * config.line_voltage;
+          fprintf(stdout, "Power: %fW\n", power);
+        }
       } else {
         fprintf(stderr, "Error reading device current\n");
         CleanupAndAbort();
@@ -188,6 +198,8 @@ int main(int argc, char **argv) {
       "Resets the charge accumulator", cmd, false);
   SwitchArg log_current_arg("", "current",
       "Print the current used by attached devices", cmd, false);
+  SwitchArg log_power_arg("", "power",
+      "Print the power used by attached devices", cmd, false);
   SwitchArg log_energy_arg("", "energy",
       "Print energy (in kWh) used by attached devices since the last reset",
       cmd, false);
@@ -267,6 +279,7 @@ int main(int argc, char **argv) {
   // Build a logging config and log device information as requested.
   LoggingConfig logging_config;
   logging_config.log_current = log_current_arg.getValue();
+  logging_config.log_power = log_power_arg.getValue();
   logging_config.log_energy = log_energy_arg.isSet();
   logging_config.line_voltage = line_voltage_arg.getValue();
   logging_config.log_indefinitely = log_indefinitely_arg.getValue();
