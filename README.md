@@ -4,6 +4,9 @@ A tool for interacting with the Power USB line of USB-connected power strips.
 
 More information about this hardware is available here: http://www.pwrusb.com/
 
+This project was not created in affiliation with the vendor so do not contact
+them for support.
+
 ## Usage Instructions
 
 Run the binary with ``--help`` to obtain usage information.
