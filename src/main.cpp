@@ -71,13 +71,15 @@ struct LoggingConfig {
   }
 };
 
-//! Releases any global resources and quits with an error.
+/**
+ * Releases any global resources and quits with an error.
+ */
 void CleanupAndAbort() {
   hid_exit();
   exit(-1);
 }
 
-/*
+/**
  * Prints the device type and logs any errors.
  *
  * @param device The device to print the type of.
