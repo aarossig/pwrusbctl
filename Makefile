@@ -19,10 +19,23 @@ CFLAGS  = -std=c++11
 CFLAGS += -Isrc/
 CFLAGS += -Wall
 
+# HIDAPI Support ################################################################
+
+# When targetting Linux there are two options given for hidapi, but neither are
+# called 'hidapi' which mandates the use of this condition.
+
+HOST_OS = $(shell uname)
+
+ifeq ($(HOST_OS), Linux)
+LIBHIDAPI = hidapi-libusb
+else
+LIBHIDAPI = hidapi
+endif
+
 # CLI Compiler Flags ###########################################################
 
 PWRUSBCTL_CFLAGS = $(CFLAGS)
-PWRUSBCTL_CFLAGS += `pkg-config --cflags hidapi-libusb`
+PWRUSBCTL_CFLAGS += `pkg-config --cflags $(LIBHIDAPI)`
 
 # Common Linker Flags ##########################################################
 
@@ -31,7 +44,7 @@ LDFLAGS =
 # CLI Linker Flags #############################################################
 
 PWRUSBCTL_LDFLAGS  = $(LDFLAGS)
-PWRUSBCTL_LDFLAGS += `pkg-config --libs hidapi-libusb`
+PWRUSBCTL_LDFLAGS += `pkg-config --libs $(LIBHIDAPI)`
 
 # Build Targets ################################################################
 
