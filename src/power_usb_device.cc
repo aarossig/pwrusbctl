@@ -65,8 +65,22 @@ constexpr uint8_t kSetPowerOnCommands[] = {
   0x45,
 };
 
+//! The default power off command values.
+constexpr uint8_t kSetDefaultPowerOffCommands[] = {
+  0x46,
+  0x51,
+  0x48,
+};
+
+//! The default power on command values.
+constexpr uint8_t kSetDefaultPowerOnCommands[] = {
+  0x4E,
+  0x47,
+  0x4F,
+};
+
 float PowerUsbDevice::ConvertChargeToKilowattHours(int32_t milliamp_minutes,
-                                                   int line_voltage) {
+                                                   float line_voltage) {
   float amp_hours = milliamp_minutes / 60.0f / 1000.0f;
   return (amp_hours * line_voltage) / 1000.0f;
 }
@@ -118,6 +132,28 @@ bool PowerUsbDevice::SetSocketState(size_t index, SocketState state) const {
     command_value = kSetPowerOnCommands[index];
   } else if (state == SocketState::Off) {
     command_value = kSetPowerOffCommands[index];
+  } else {
+    // Handle the case of an unhandled socket state.
+    assert(false);
+  }
+
+  return DeviceWrite(&command_value, 1);
+}
+
+bool PowerUsbDevice::SetDefaultSocketState(size_t index, SocketState state) const {
+  // The index supplied must be less than 3. If the strip is indexed out of
+  // bounds no operation is performed.
+  assert(index < kSocketCount);
+  if (index >= kSocketCount) {
+    return false;
+  }
+
+  // Set the state of the socket.
+  uint8_t command_value;
+  if (state == SocketState::On) {
+    command_value = kSetDefaultPowerOnCommands[index];
+  } else if (state == SocketState::Off) {
+    command_value = kSetDefaultPowerOffCommands[index];
   } else {
     // Handle the case of an unhandled socket state.
     assert(false);

@@ -49,8 +49,8 @@ class PowerUsbDevice : public NonCopyable {
    * @param line_voltage The approximate AC voltage of the line.
    * @return The amount of energy expressed in kWh.
    */
-  static float ConvertChargeToKilowattHours(int32_t milliamp_seconds,
-                                            int line_voltage);
+  static float ConvertChargeToKilowattHours(int32_t milliamp_minutes,
+                                            float line_voltage);
 
   /**
    * Constructs a PowerUsbDevice by opening the first (or only) PowerUSB
@@ -101,6 +101,19 @@ class PowerUsbDevice : public NonCopyable {
    * @return Returns false if an error occurs.
    */
   bool SetSocketState(size_t index, SocketState state) const;
+
+  /**
+   * Sets the default state of a power outlet given an index. If the index is
+   * out of range for the connected device no operation is performed. For debug
+   * builds (those compiled without NDEBUG), an assertion will catch this error.
+   * For NDEBUG builds, false will be returned False is also returned if an
+   * error in HIDAPI occurs.
+   *
+   * @param index The index of the socket to set.
+   * @param state The default state to set the index of the socket to.
+   * @return Returns false if an error occurs.
+   */
+  bool SetDefaultSocketState(size_t index, SocketState state) const;
 
   /**
    * Obtains the total instantaneous current as measured by the power strip.
