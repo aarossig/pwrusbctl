@@ -89,6 +89,12 @@ PowerUsbDevice::PowerUsbDevice() {
   device_ = hid_open(kVendorId, kProductId, nullptr);
 }
 
+PowerUsbDevice::~PowerUsbDevice() {
+  if (IsInitialized()) {
+    hid_close(device_);
+  }
+}
+
 bool PowerUsbDevice::IsInitialized() const {
   return (device_ != nullptr);
 }

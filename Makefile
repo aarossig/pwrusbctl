@@ -6,7 +6,7 @@
 
 # CLI Sources ##################################################################
 
-PWRUSBCTL_SRCS = src/main.cpp
+PWRUSBCTL_SRCS = src/main.cc
 PWRUSBCTL_SRCS += src/power_usb_device.cc
 
 # Binary Targets ###############################################################
@@ -45,13 +45,14 @@ LDFLAGS =
 
 PWRUSBCTL_LDFLAGS  = $(LDFLAGS)
 PWRUSBCTL_LDFLAGS += `pkg-config --libs $(LIBHIDAPI)`
+PWRUSBCTL_LDFLAGS += -lpthread
 
 # Build Targets ################################################################
 
 all: $(PWRUSBCTL_BIN)
 
 $(PWRUSBCTL_BIN): $(PWRUSBCTL_SRCS)
-	g++ $(PWRUSBCTL_CFLAGS) $(PWRUSBCTL_LDFLAGS) $^ -o $@
+	g++ $^ $(PWRUSBCTL_CFLAGS) $(PWRUSBCTL_LDFLAGS) -o $@
 
 run_pwrusbctl: $(PWRUSBCTL_BIN)
 	./$(PWRUSBCTL_BIN)

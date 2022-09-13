@@ -242,51 +242,53 @@ int main(int argc, char **argv) {
     CleanupAndAbort();
   }
 
-  PowerUsbDevice device;
-  if (!device.IsInitialized()) {
-    fprintf(stderr, "Error opening the Power USB device: not found\n");
-    CleanupAndAbort();
-  }
+  {
+    PowerUsbDevice device;
+    if (!device.IsInitialized()) {
+      fprintf(stderr, "Error opening the Power USB device: not found\n");
+      CleanupAndAbort();
+    }
 
-  if (print_device_info_arg.getValue()) {
-    PrintDeviceType(device);
-  }
+    if (print_device_info_arg.getValue()) {
+      PrintDeviceType(device);
+    }
 
-  if (reset_charge_accumulator_arg.getValue()) {
-    ResetChargeAccumulator(device);
-  }
+    if (reset_charge_accumulator_arg.getValue()) {
+      ResetChargeAccumulator(device);
+    }
 
-  if (outlet_default_enable_arg.isSet()) {
-    size_t outlet_index = outlet_enable_arg.getValue();
-    SetDefaultSocketState(device, outlet_index, SocketState::On);
-  }
+    if (outlet_default_enable_arg.isSet()) {
+      size_t outlet_index = outlet_enable_arg.getValue();
+      SetDefaultSocketState(device, outlet_index, SocketState::On);
+    }
 
-  if (outlet_default_disable_arg.isSet()) {
-    size_t outlet_index = outlet_disable_arg.getValue();
-    SetDefaultSocketState(device, outlet_index, SocketState::Off);
-  }
+    if (outlet_default_disable_arg.isSet()) {
+      size_t outlet_index = outlet_disable_arg.getValue();
+      SetDefaultSocketState(device, outlet_index, SocketState::Off);
+    }
 
-  if (outlet_enable_arg.isSet()) {
-    size_t outlet_index = outlet_enable_arg.getValue();
-    SetSocketState(device, outlet_index, SocketState::On);
-  }
+    if (outlet_enable_arg.isSet()) {
+      size_t outlet_index = outlet_enable_arg.getValue();
+      SetSocketState(device, outlet_index, SocketState::On);
+    }
 
-  if (outlet_disable_arg.isSet()) {
-    size_t outlet_index = outlet_disable_arg.getValue();
-    SetSocketState(device, outlet_index, SocketState::Off);
-  }
+    if (outlet_disable_arg.isSet()) {
+      size_t outlet_index = outlet_disable_arg.getValue();
+      SetSocketState(device, outlet_index, SocketState::Off);
+    }
 
-  // Build a logging config and log device information as requested.
-  LoggingConfig logging_config;
-  logging_config.log_current = log_current_arg.getValue();
-  logging_config.log_power = log_power_arg.getValue();
-  logging_config.log_energy = log_energy_arg.isSet();
-  logging_config.line_voltage = line_voltage_arg.getValue();
-  logging_config.log_indefinitely = log_indefinitely_arg.getValue();
-  logging_config.log_count = log_count_arg.getValue();
-  logging_config.interval_us = interval_us_arg.getValue();
-  if (logging_config.LogsEnabled()) {
-    LogStats(device, logging_config);
+    // Build a logging config and log device information as requested.
+    LoggingConfig logging_config;
+    logging_config.log_current = log_current_arg.getValue();
+    logging_config.log_power = log_power_arg.getValue();
+    logging_config.log_energy = log_energy_arg.isSet();
+    logging_config.line_voltage = line_voltage_arg.getValue();
+    logging_config.log_indefinitely = log_indefinitely_arg.getValue();
+    logging_config.log_count = log_count_arg.getValue();
+    logging_config.interval_us = interval_us_arg.getValue();
+    if (logging_config.LogsEnabled()) {
+      LogStats(device, logging_config);
+    }
   }
 
   // Cleanup after the hidapi library and exit cleanly.

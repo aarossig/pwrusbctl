@@ -64,6 +64,11 @@ class PowerUsbDevice : public NonCopyable {
   PowerUsbDevice();
 
   /**
+   * Release the PowerUsbDevice by closing the device.
+   */
+  ~PowerUsbDevice();
+
+  /**
    * Determines whether or not the device has been initialized. This method must
    * be invoked before any other API provided by this class. If this method
    * returns false, no PowerUsbDevice was available to be opened.
