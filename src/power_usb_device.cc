@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-#include <cassert>
-
 #include "power_usb_device.h"
+
+#include <cassert>
+#include <cstdio>
 
 namespace pwrusbctl {
 
@@ -50,6 +51,9 @@ constexpr uint8_t kGetAccumulatedEnergyCommand(0xB2);
 
 //! The command used to reset the charge accumulator in the device.
 constexpr uint8_t kResetChargeAccumulatorCommand(0xB3);
+
+//! The command used to set the current sense ratio.
+constexpr uint8_t kSetCurrentSenseRatioCommand(0xB6);
 
 //! The power off command values.
 constexpr uint8_t kSetPowerOffCommands[] = {
@@ -214,6 +218,13 @@ bool PowerUsbDevice::GetAccumulatedCharge(int32_t *accumulated_charge) const {
 bool PowerUsbDevice::ResetChargeAccumulator() const {
   uint8_t reset_charge_accumulator = kResetChargeAccumulatorCommand;
   return DeviceWrite(&reset_charge_accumulator, 1);
+}
+
+bool PowerUsbDevice::SetCurrentRatio(float ratio) const {
+  uint8_t command_buffer[2];
+  command_buffer[0] = kSetCurrentSenseRatioCommand;
+  command_buffer[1] = ratio * INT8_MAX;
+  return DeviceWrite(command_buffer, sizeof(command_buffer));
 }
 
 bool PowerUsbDevice::DeviceWrite(const uint8_t *buffer, size_t length) const {

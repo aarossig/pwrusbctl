@@ -110,6 +110,21 @@ void ResetChargeAccumulator(const PowerUsbDevice& device) {
 }
 
 /**
+ * Sets the ratio of current measurements and logs any errors.
+ */
+void SetCurrentRatio(const PowerUsbDevice& device, float ratio) {
+  if (ratio < -1.0f || ratio > 1.0f) {
+    fprintf(stderr, "Invalid current ratio %f\n", ratio);
+    CleanupAndAbort();
+  }
+
+  if (!device.SetCurrentRatio(ratio)) {
+    fprintf(stderr, "Failed to set current ratio\n");
+    CleanupAndAbort();
+  }
+}
+
+/**
  * Sets the state of a socket and logs any errors.
  *
  * @param device The PowerUsbDevice to manipulate.
@@ -185,6 +200,7 @@ void LogStats(const PowerUsbDevice& device, const LoggingConfig& config) {
 int main(int argc, char **argv) {
   using TCLAP::Arg;
   using TCLAP::CmdLine;
+  using TCLAP::MultiArg;
   using TCLAP::SwitchArg;
   using TCLAP::ValueArg;
 
@@ -196,6 +212,9 @@ int main(int argc, char **argv) {
       "Print device information", cmd, false);
   SwitchArg reset_charge_accumulator_arg("", "reset_charge_accumulator",
       "Resets the charge accumulator", cmd, false);
+  ValueArg<float> set_current_ratio_arg("", "set_current_ratio",
+      "Sets the ratio of the current measurement",
+      false, 0.0f, "percent", cmd);
   SwitchArg log_current_arg("", "current",
       "Print the current used by attached devices", cmd, false);
   SwitchArg log_power_arg("", "power",
@@ -224,10 +243,10 @@ int main(int argc, char **argv) {
       false, 0, "index", cmd);
 
   // Outlet state args.
-  ValueArg<size_t> outlet_enable_arg("", "outlet_enable",
-      "The index of the outlet to enable", false, 0, "index", cmd);
-  ValueArg<size_t> outlet_disable_arg("", "outlet_disable",
-      "The index of the outlet to disable", false, 0, "index", cmd);
+  MultiArg<size_t> outlet_enable_arg("", "outlet_enable",
+      "The index of the outlet to enable", false, "index", cmd);
+  MultiArg<size_t> outlet_disable_arg("", "outlet_disable",
+      "The index of the outlet to disable", false, "index", cmd);
 
   // Parse arguments.
   cmd.parse(argc, argv);
@@ -257,23 +276,25 @@ int main(int argc, char **argv) {
       ResetChargeAccumulator(device);
     }
 
+    if (set_current_ratio_arg.isSet()) {
+      SetCurrentRatio(device, set_current_ratio_arg.getValue());
+    }
+
     if (outlet_default_enable_arg.isSet()) {
-      size_t outlet_index = outlet_enable_arg.getValue();
+      size_t outlet_index = outlet_default_enable_arg.getValue();
       SetDefaultSocketState(device, outlet_index, SocketState::On);
     }
 
     if (outlet_default_disable_arg.isSet()) {
-      size_t outlet_index = outlet_disable_arg.getValue();
+      size_t outlet_index = outlet_default_disable_arg.getValue();
       SetDefaultSocketState(device, outlet_index, SocketState::Off);
     }
 
-    if (outlet_enable_arg.isSet()) {
-      size_t outlet_index = outlet_enable_arg.getValue();
+    for (size_t outlet_index : outlet_enable_arg) {
       SetSocketState(device, outlet_index, SocketState::On);
     }
 
-    if (outlet_disable_arg.isSet()) {
-      size_t outlet_index = outlet_disable_arg.getValue();
+    for (size_t outlet_index : outlet_disable_arg) {
       SetSocketState(device, outlet_index, SocketState::Off);
     }
 

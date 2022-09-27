@@ -150,6 +150,14 @@ class PowerUsbDevice : public NonCopyable {
    */
   bool ResetChargeAccumulator() const;
 
+  /**
+   * Sets the current sense ratio with a value from 0.0f to 1.0f.
+   *
+   * @param ratio The ratio of current sensing to apply.
+   * @return Returns false if an error occurs.
+   */
+  bool SetCurrentRatio(float ratio) const;
+
  private:
   //! The underlying HID device used to communicate with the PowerUSB device.
   hid_device *device_;
