@@ -37,6 +37,9 @@ constexpr useconds_t kDefaultLoggingIntervalUs(200000);
 //! The default line voltage when computing energy consumption.
 constexpr float kDefaultLineVoltage(115.0f);
 
+//! The default minimum power to disable idle ports.
+constexpr float kDefaultMinPower(10.0f);
+
 /**
  * A configuration for how to log data from the PowerUsb device.
  */
@@ -247,6 +250,8 @@ int main(int argc, char **argv) {
       "The index of the outlet to enable", false, "index", cmd);
   MultiArg<size_t> outlet_disable_arg("", "outlet_disable",
       "The index of the outlet to disable", false, "index", cmd);
+  MultiArg<size_t> outlet_disable_if_idle_arg("", "outlet_disable_if_idle",
+      "The index of the outlet to disable if idle", false, "index", cmd);
 
   // Parse arguments.
   cmd.parse(argc, argv);
@@ -296,6 +301,19 @@ int main(int argc, char **argv) {
 
     for (size_t outlet_index : outlet_disable_arg) {
       SetSocketState(device, outlet_index, SocketState::Off);
+    }
+
+    for (size_t outlet_index : outlet_disable_if_idle_arg) {
+      int16_t current;
+      if (!device.GetInstantaneousCurrent(&current)) {
+        fprintf(stderr, "Error reading device current\n");
+        CleanupAndAbort();
+      }
+
+      float power = (current / 1000.0f) * line_voltage_arg.getValue();
+      if (power < kDefaultMinPower) {
+        SetSocketState(device, outlet_index, SocketState::Off);
+      }
     }
 
     // Build a logging config and log device information as requested.
